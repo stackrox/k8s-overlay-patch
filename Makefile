@@ -35,3 +35,5 @@ lint: setup-tools
 .PHONY: all
 all: generate test lint
 
+.PHONY: ci
+ci: all test-sanity
