@@ -64,35 +64,41 @@ type K8sObjectOverlayPatch struct {
 ```go
 package reconciler
 
+import (
+	"github.com/stackrox/k8s-overlay-patch/pkg/patch"
+	"github.com/stackrox/k8s-overlay-patch/pkg/types"
+)
+
 func (r reconciler) Reconcile(obj v1alpha1.MyObject){
 	manifests := renderManifests(obj)
 	patched := patch.YAMLManifestPatch(manifests, obj.Namespace, mapOverlays(obj.Spec.Overlays))
 	// ...
 }
 
-func mapOverlays(overlays []v1alpha1.K8sObjectOverlay) []patch.K8sObjectOverlay {
-    out := make([]patch.K8sObjectOverlay, len(overlays))
-    for i, o := range overlays {
-        out[i] = patch.K8sObjectOverlay{
-            ApiVersion: o.ApiVersion,
-            Kind:       o.Kind,
-            Name:       o.Name,
-            Patches:    mapOverlayPatches(o.Patches),
-        }
-    }
-    return out
+func mapOverlays(overlays []*v1alpha1.K8sObjectOverlay) []*types.K8sObjectOverlay {
+	out := make([]*types.K8sObjectOverlay, len(overlays))
+	for i, o := range overlays {
+		out[i] = &types.K8sObjectOverlay{
+			ApiVersion: o.ApiVersion,
+			Kind:       o.Kind,
+			Name:       o.Name,
+			Patches:    mapOverlayPatches(o.Patches),
+		}
+	}
+	return out
 }
 
-func mapOverlayPatches(patches []v1alpha1.K8sObjectOverlayPatch) []patch.K8sObjectOverlayPatch {
-    out := make([]patch.K8sObjectOverlayPatch, len(patches))
-    for i, p := range patches {
-        out[i] = patch.K8sObjectOverlayPatch{
-            Path:  p.Path,
-            Value: p.Value,
-        }
-    }  
-    return out
+func mapOverlayPatches(patches []*v1alpha1.K8sObjectOverlayPatch) []*types.K8sObjectOverlayPatch {
+	out := make([]*types.K8sObjectOverlayPatch, len(patches))
+	for i, p := range patches {
+		out[i] = &types.K8sObjectOverlayPatch{
+			Path:  p.Path,
+			Value: p.Value,
+		}
+	}
+	return out
 }
+
 
 ```
 
