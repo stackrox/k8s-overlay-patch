@@ -98,7 +98,7 @@ package patch
 import (
 	"context"
 	"fmt"
-	"github.com/stackrox/k8s-overlay-patch/pkg/apis/v1alpha1"
+	"github.com/stackrox/k8s-overlay-patch/pkg/types"
 	yaml2 "gopkg.in/yaml.v3"
 	"strings"
 
@@ -114,7 +114,7 @@ import (
 var scope = logr.FromContextOrDiscard(context.Background()).WithName("patch")
 
 // overlayMatches reports whether obj matches the overlay for either the default namespace or no namespace (cluster scope).
-func overlayMatches(overlay *v1alpha1.K8sObjectOverlay, obj *object.K8sObject, defaultNamespace string) bool {
+func overlayMatches(overlay *types.K8sObjectOverlay, obj *object.K8sObject, defaultNamespace string) bool {
 	oh := obj.Hash()
 	if oh == object.Hash(overlay.Kind, defaultNamespace, overlay.Name) ||
 		oh == object.Hash(overlay.Kind, "", overlay.Name) {
@@ -126,7 +126,7 @@ func overlayMatches(overlay *v1alpha1.K8sObjectOverlay, obj *object.K8sObject, d
 // YAMLManifestPatch patches a base YAML in the given namespace with a list of overlays.
 // Each overlay has the format described in the K8sObjectOverlay definition.
 // It returns the patched manifest YAML.
-func YAMLManifestPatch(baseYAML string, defaultNamespace string, overlays []*v1alpha1.K8sObjectOverlay) (string, error) {
+func YAMLManifestPatch(baseYAML string, defaultNamespace string, overlays []*types.K8sObjectOverlay) (string, error) {
 	var ret strings.Builder
 	var errs util.Errors
 	objs, err := object.ParseK8sObjectsFromYAMLManifest(baseYAML)
@@ -134,7 +134,7 @@ func YAMLManifestPatch(baseYAML string, defaultNamespace string, overlays []*v1a
 		return "", err
 	}
 
-	matches := make(map[*v1alpha1.K8sObjectOverlay]object.K8sObjects)
+	matches := make(map[*types.K8sObjectOverlay]object.K8sObjects)
 	// Try to apply the defined overlays.
 	for _, obj := range objs {
 		oy, err := obj.YAML()
@@ -173,7 +173,7 @@ func YAMLManifestPatch(baseYAML string, defaultNamespace string, overlays []*v1a
 
 // applyPatches applies the given patches against the given object. It returns the resulting patched YAML if successful,
 // or a list of errors otherwise.
-func applyPatches(base *object.K8sObject, patches []*v1alpha1.K8sObjectOverlayPatch) (outYAML string, errs util.Errors) {
+func applyPatches(base *object.K8sObject, patches []*types.K8sObjectOverlayPatch) (outYAML string, errs util.Errors) {
 	bo := make(map[any]any)
 	by, err := base.YAML()
 	if err != nil {

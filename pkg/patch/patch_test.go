@@ -16,7 +16,7 @@ package patch
 
 import (
 	"fmt"
-	"github.com/stackrox/k8s-overlay-patch/pkg/apis/v1alpha1"
+	"github.com/stackrox/k8s-overlay-patch/pkg/types"
 	"gopkg.in/yaml.v3"
 	"testing"
 
@@ -24,7 +24,7 @@ import (
 )
 
 type KubernetesResourcesSpec struct {
-	Overlays []*v1alpha1.K8sObjectOverlay `json:"overlays"`
+	Overlays []*types.K8sObjectOverlay `json:"overlays"`
 }
 
 func TestPatchYAMLManifestSuccess(t *testing.T) {

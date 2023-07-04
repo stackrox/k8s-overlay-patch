@@ -9,16 +9,12 @@ download:
 setup-tools: download
 	cat tools/tools.go | grep _ | awk -F'"' '{print $$2}' | xargs -tI % go install %
 
-.PHONY: generate
-generate: setup-tools
-	deepcopy-gen -i github.com/stackrox/k8s-overlay-patch/pkg/apis/v1alpha1 -h hack/boilerplate.go.txt --trim-path-prefix github.com/stackrox/k8s-overlay-patch --output-base . --output-package github.com/stackrox/k8s-overlay-patch/pkg/apis/v1alpha1 -O zz_deepcopy
-
 .PHONY: test
 test:
 	go test ./...
 
 .PHONY: test-sanity
-test-sanity: generate fix lint ## Test repo formatting, linting, etc.
+test-sanity: fix lint ## Test repo formatting, linting, etc.
 	go vet ./...
 	git diff --exit-code # diff again to ensure other checks don't change repo
 
@@ -33,7 +29,7 @@ lint: setup-tools
 	golangci-lint run
 
 .PHONY: all
-all: generate test lint
+all: test lint
 
 .PHONY: ci
 ci: all test-sanity
