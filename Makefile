@@ -29,7 +29,7 @@ lint: setup-tools
 	golangci-lint run
 
 .PHONY: all
-all: test lint
+all: setup-tools test lint
 
 .PHONY: ci
 ci: all test-sanity
