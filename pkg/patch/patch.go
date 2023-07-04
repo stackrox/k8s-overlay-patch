@@ -208,9 +208,12 @@ func applyPatches(base *object.K8sObject, patches []*types.K8sObjectOverlayPatch
 			errs = util.AppendErr(errs, err)
 		}
 	}
-	oy, err := yaml2.Marshal(bo)
+	var out strings.Builder
+	var marshaler = yaml2.NewEncoder(&out)
+	marshaler.SetIndent(2)
+	err = marshaler.Encode(bo)
 	if err != nil {
 		return "", util.AppendErr(errs, err)
 	}
-	return string(oy), errs
+	return out.String(), errs
 }
