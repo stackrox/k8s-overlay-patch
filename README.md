@@ -53,7 +53,7 @@ helm template [NAME] [CHART] --post-renderer postrender.sh
 
 ```
 
-## Example
+## Example usage with CRD
 
 #### Adding the overlay patch to the CRD
 ```go
