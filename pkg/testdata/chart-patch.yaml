@@ -1,0 +1,8 @@
+overlays:
+  - apiVersion: v1
+    kind: Deployment
+    name: test-example-chart
+    patches:
+      - path: metadata.annotations
+        value: |
+          my: annotation

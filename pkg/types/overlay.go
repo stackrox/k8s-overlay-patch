@@ -38,3 +38,7 @@ type K8sObjectOverlayPatch struct {
 	// All values are strings but are converted into appropriate type based on schema.
 	Value string `json:"value,omitempty"`
 }
+
+type OverlayObject struct {
+	Overlays []*K8sObjectOverlay `json:"overlays,omitempty"`
+}

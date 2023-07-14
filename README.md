@@ -13,6 +13,46 @@ This library implements logic so that these overlays are a first-class citizen i
 users to customize the output of a kubernetes operator by overlaying patches on top of the generated output, without
 having to modify the CRD.
 
+## Command-line usage
+
+```
+Usage:
+  k8s-overlay-patch [flags]
+
+Flags:
+  -h, --help                   help for k8s-overlay-patch
+  -m, --manifest-file string   File containing the rendered manifests to patch
+  -n, --namespace string       Namespace to use when patching the manifests
+  -o, --out string             File to write the patched manifests to
+  -p, --patch-file string      File containing the patch to apply
+```
+
+
+## Usage as helm post-renderer
+
+Example
+
+```
+helm template test pkg/testdata/chart --debug --dry-run --post-renderer pkg/testdata/postrender.sh
+```
+
+```
+# build the binary and place it in your path
+go build
+
+# Create a postrender.sh file. Helm doesn't allow passing
+# arguments to postrenderers.
+#!/bin/bash
+k8s-overlay-patch -n default -p patch.yaml
+
+# Make the file executable
+chmod +x postrender.sh
+
+# Call helm with the postrender.sh file
+helm template [NAME] [CHART] --post-renderer postrender.sh
+
+```
+
 ## Example
 
 #### Adding the overlay patch to the CRD
