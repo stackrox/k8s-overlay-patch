@@ -3,7 +3,7 @@ module github.com/stackrox/k8s-overlay-patch
 go 1.20
 
 require (
-	github.com/evanphx/json-patch/v5 v5.6.0
+	github.com/evanphx/json-patch/v5 v5.9.0
 	github.com/go-logr/logr v1.2.4
 	github.com/golangci/golangci-lint v1.53.3
 	github.com/kylelemons/godebug v1.1.0
