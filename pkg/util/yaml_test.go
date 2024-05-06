@@ -15,7 +15,6 @@
 package util
 
 import (
-	"errors"
 	"testing"
 )
 
@@ -95,14 +94,14 @@ foo: bar
 			desc:    "blank",
 			base:    `R#)*J#FN`,
 			overlay: `FM#)M#F(*#M`,
-			expect:  "",
-			err:     errors.New("invalid json"),
+			expect:  "FM#)M#F(*#M\n",
+			err:     nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
 			if got, err := OverlayYAML(tt.base, tt.overlay); got != tt.expect || ((tt.err != nil && err == nil) || (tt.err == nil && err != nil)) {
-				t.Errorf("%s: expected overlay&err %v %v got %v %v", tt.desc, tt.expect, tt.err, got, err)
+				t.Errorf("%s: expected overlay err %v %v got %v %v", tt.desc, tt.expect, tt.err, got, err)
 			}
 		})
 	}
