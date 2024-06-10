@@ -23,6 +23,8 @@ type K8sObjectOverlay struct {
 	Name string `json:"name,omitempty"`
 	// List of patches to apply to resource.
 	Patches []*K8sObjectOverlayPatch `json:"patches,omitempty"`
+	// Optional marks the overlay as optional. If the resource does not exist, the overlay is ignored.
+	Optional bool `json:"optional,omitempty"`
 }
 
 type K8sObjectOverlayPatch struct {

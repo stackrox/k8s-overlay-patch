@@ -160,6 +160,10 @@ func YAMLManifestPatch(baseYAML string, defaultNamespace string, overlays []*typ
 		// Each overlay should have exactly one match in the output manifest.
 		switch {
 		case len(matches[overlay]) == 0:
+			if overlay.Optional {
+				scope.V(2).Info("overlay for %s:%s is optional and does not match any object in output manifest", overlay.Kind, overlay.Name)
+				continue
+			}
 			errs = util.AppendErr(errs, fmt.Errorf("overlay for %s:%s does not match any object in output manifest. Available objects are:\n%s",
 				overlay.Kind, overlay.Name, strings.Join(objs.Keys(), "\n")))
 		case len(matches[overlay]) > 1:
