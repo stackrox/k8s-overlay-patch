@@ -6,7 +6,7 @@ toolchain go1.22.4
 
 require (
 	github.com/evanphx/json-patch/v5 v5.9.0
-	github.com/go-logr/logr v1.4.1
+	github.com/go-logr/logr v1.4.2
 	github.com/golangci/golangci-lint v1.53.3
 	github.com/kylelemons/godebug v1.1.0
 	github.com/spf13/cobra v1.8.0
