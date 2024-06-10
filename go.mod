@@ -2,7 +2,7 @@ module github.com/stackrox/k8s-overlay-patch
 
 go 1.21
 
-toolchain go1.21.7
+toolchain go1.22.4
 
 require (
 	github.com/evanphx/json-patch/v5 v5.9.0
