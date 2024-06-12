@@ -1,6 +1,6 @@
 module github.com/stackrox/k8s-overlay-patch
 
-go 1.21
+go 1.22.0
 
 toolchain go1.22.4
 
@@ -13,7 +13,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	google.golang.org/protobuf v1.33.0
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/apimachinery v0.29.3
+	k8s.io/apimachinery v0.30.2
 	sigs.k8s.io/yaml v1.4.0
 )
 
@@ -202,7 +202,7 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	honnef.co/go/tools v0.4.7 // indirect
-	k8s.io/klog/v2 v2.110.1 // indirect
+	k8s.io/klog/v2 v2.120.1 // indirect
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b // indirect
 	mvdan.cc/gofumpt v0.6.0 // indirect
 	mvdan.cc/unparam v0.0.0-20240528143540-8a5130ca722f // indirect
