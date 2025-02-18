@@ -95,6 +95,10 @@ type K8sObjectOverlayPatch struct {
 	// All values are strings but are converted into appropriate type based on schema.
 	//+operator-sdk:csv:customresourcedefinitions:type=spec,displayName="Value",order=2
 	Value string `json:"value,omitempty"`
+	// Verbatim value to add, delete or replace.
+	// Same as Value, however but the content is not interpreted as YAML, but treated as literal string instead.
+	// At least one of Value and Verbatim must be empty.
+	Verbatim string `json:"verbatim,omitempty"`
 }
 
 ```
@@ -132,8 +136,9 @@ func mapOverlayPatches(patches []*v1alpha1.K8sObjectOverlayPatch) []*types.K8sOb
 	out := make([]*types.K8sObjectOverlayPatch, len(patches))
 	for i, p := range patches {
 		out[i] = &types.K8sObjectOverlayPatch{
-			Path:  p.Path,
-			Value: p.Value,
+			Path:     p.Path,
+			Value:    p.Value,
+			Verbatim: p.Verbatim,
 		}
 	}
 	return out
@@ -164,5 +169,7 @@ spec:
     - path: data.foo
       value: bar
     - path: data.baz
-      value: qux
+      verbatim: |
+        qux
+        separate lines
 ```

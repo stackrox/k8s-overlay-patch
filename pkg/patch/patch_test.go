@@ -17,6 +17,8 @@ package patch
 import (
 	"fmt"
 	"github.com/stackrox/k8s-overlay-patch/pkg/types"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
 	"testing"
 
@@ -25,6 +27,20 @@ import (
 
 type KubernetesResourcesSpec struct {
 	Overlays []*types.K8sObjectOverlay `json:"overlays"`
+}
+
+func TestYAMLManifestPatchValidation(t *testing.T) {
+	_, err := YAMLManifestPatch("", "", []*types.K8sObjectOverlay{
+		{
+			Patches: []*types.K8sObjectOverlayPatch{
+				{
+					Value:    "a",
+					Verbatim: "b",
+				},
+			},
+		},
+	})
+	assert.ErrorContains(t, err, "value and verbatim cannot be used together in overlay 0 patch 0")
 }
 
 func TestPatchYAMLManifestSuccess(t *testing.T) {
@@ -490,6 +506,66 @@ spec:
 				t.Errorf("YAMLManifestPatch(%s): got:\n%s\n\nwant:\n%s\nDiff:\n%s\n", tt.desc, got, want, util.YAMLDiff(got, want))
 			}
 		})
+	}
+}
+
+func TestPatchYAMLConfigMap(t *testing.T) {
+	base := `
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: a-cm
+  namespace: stackrox
+data:
+  postgresql.conf: |
+    hba_file = '/etc/stackrox.d/config/pg_hba.conf'
+    foo = "bar"
+    log_timezone = 'Etc/UTC' # comment
+    more = true
+  hba.conf: |-
+    # PostgreSQL Client Authentication Configuration File
+    local   all             all                                     scram-sha-256
+`
+
+	overlays := `overlays:
+- apiVersion: v1
+  kind: ConfigMap
+  name: a-cm
+  patches:
+  - path: data.postgresql\.conf
+    verbatim: |
+      hba_file = '/etc/stackrox.d/config/pg_hba.conf'
+      foo = "bar"
+
+      log_timezone = 'Etc/UTC' # comment
+      more = false
+`
+	want := `
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: a-cm
+  namespace: stackrox
+data:
+  postgresql.conf: |
+    hba_file = '/etc/stackrox.d/config/pg_hba.conf'
+    foo = "bar"
+
+    log_timezone = 'Etc/UTC' # comment
+    more = false
+  hba.conf: |-
+    # PostgreSQL Client Authentication Configuration File
+    local   all             all                                     scram-sha-256
+`
+	rc := &KubernetesResourcesSpec{}
+	if err := yaml.Unmarshal([]byte(overlays), rc); err != nil {
+		t.Fatalf("yaml.Unmarshal(): got error %s for string:\n%s\n", err, overlays)
+	}
+	t.Logf("%+v", rc.Overlays[0].Patches[0].Value)
+	got, err := YAMLManifestPatch(base, "stackrox", rc.Overlays)
+	require.NoError(t, err, "YAMLManifestPatch failed")
+	if !util.IsYAMLEqual(got, want) {
+		t.Errorf("YAMLManifestPatch(): got:\n%s\n\nwant:\n%s\nDiff:\n%s\n", got, want, util.YAMLDiff(got, want))
 	}
 }
 
