@@ -96,8 +96,9 @@ type K8sObjectOverlayPatch struct {
 	//+operator-sdk:csv:customresourcedefinitions:type=spec,displayName="Value",order=2
 	Value string `json:"value,omitempty"`
 	// Verbatim value to add, delete or replace.
-	// Same as Value, however but the content is not interpreted as YAML, but treated as literal string instead.
+	// Same as Value, however the content is not interpreted as YAML, but treated as literal string instead.
 	// At least one of Value and Verbatim must be empty.
+	//+operator-sdk:csv:customresourcedefinitions:type=spec,displayName="Verbatim",order=3
 	Verbatim string `json:"verbatim,omitempty"`
 }
 
