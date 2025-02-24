@@ -133,6 +133,9 @@ func YAMLManifestPatch(baseYAML string, defaultNamespace string, overlays []*typ
 	if err != nil {
 		return "", err
 	}
+	for i, overlay := range overlays {
+		errs = util.AppendErr(errs, validateOverlay(i, overlay))
+	}
 
 	matches := make(map[*types.K8sObjectOverlay]object.K8sObjects)
 	// Try to apply the defined overlays.
@@ -175,6 +178,16 @@ func YAMLManifestPatch(baseYAML string, defaultNamespace string, overlays []*typ
 	return ret.String(), errs.ToError()
 }
 
+func validateOverlay(overlayIndex int, overlay *types.K8sObjectOverlay) error {
+	var errs util.Errors
+	for patchIndex, patch := range overlay.Patches {
+		if patch.Value != "" && patch.Verbatim != "" {
+			errs = util.AppendErr(errs, fmt.Errorf("value and verbatim cannot be used together in overlay %d patch %d", overlayIndex, patchIndex))
+		}
+	}
+	return errs.ToError()
+}
+
 // applyPatches applies the given patches against the given object. It returns the resulting patched YAML if successful,
 // or a list of errors otherwise.
 func applyPatches(base *object.K8sObject, patches []*types.K8sObjectOverlayPatch) (outYAML string, errs util.Errors) {
@@ -189,25 +202,28 @@ func applyPatches(base *object.K8sObject, patches []*types.K8sObjectOverlayPatch
 		return "", util.NewErrs(err)
 	}
 	for _, p := range patches {
-
-		var v = &structpb.Value{}
-		if err := util.UnmarshalWithJSONPB(p.Value, v, false); err != nil {
-			errs = util.AppendErr(errs, err)
-			continue
+		var value interface{}
+		if p.Verbatim != "" && p.Value == "" {
+			value = p.Verbatim
+		} else {
+			var v = &structpb.Value{}
+			if err := util.UnmarshalWithJSONPB(p.Value, v, false); err != nil {
+				errs = util.AppendErr(errs, err)
+				continue
+			}
+			value = v.AsInterface()
 		}
-
 		if strings.TrimSpace(p.Path) == "" {
-			scope.V(2).Info("skipping empty path", "value", p.Value)
+			scope.V(2).Info("skipping empty path", "value", value)
 			continue
 		}
-		scope.Info("applying", "path", p.Path, "value", p.Value)
+		scope.Info("applying", "path", p.Path, "value", value)
 		inc, _, err := tpath.GetPathContext(bo, util.PathFromString(p.Path), true)
 		if err != nil {
 			errs = util.AppendErr(errs, err)
 			continue
 		}
-
-		err = tpath.WritePathContext(inc, v.AsInterface(), false)
+		err = tpath.WritePathContext(inc, value, false)
 		if err != nil {
 			errs = util.AppendErr(errs, err)
 		}

@@ -39,6 +39,10 @@ type K8sObjectOverlayPatch struct {
 	// For replace, path should reference an existing node.
 	// All values are strings but are converted into appropriate type based on schema.
 	Value string `json:"value,omitempty"`
+	// Verbatim value to add, delete or replace.
+	// Same as Value, however the content is not interpreted as YAML, but treated as literal string instead.
+	// At least one of Value and Verbatim must be empty.
+	Verbatim string `json:"verbatim,omitempty"`
 }
 
 type OverlayObject struct {
