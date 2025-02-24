@@ -350,7 +350,7 @@ a: {}
 				return
 			}
 
-			err := WritePathContext(pc, tt.value, false)
+			err := WritePathContext(pc, tt.value, false, true)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -752,7 +752,7 @@ values:
 		if err != nil {
 			t.Fatalf("GetPathContext(%q): %v", override.path, err)
 		}
-		err = WritePathContext(pc, override.value, false)
+		err = WritePathContext(pc, override.value, false, true)
 		if err != nil {
 			t.Fatalf("WritePathContext(%q): %v", override.path, err)
 		}
@@ -828,7 +828,7 @@ values:
 				return
 			}
 
-			err := WritePathContext(pc, tt.value, false)
+			err := WritePathContext(pc, tt.value, false, true)
 			if err != nil {
 				t.Fatal(err)
 			}

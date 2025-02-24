@@ -203,8 +203,10 @@ func applyPatches(base *object.K8sObject, patches []*types.K8sObjectOverlayPatch
 	}
 	for _, p := range patches {
 		var value interface{}
+		var tryUnmarshal bool
 		if p.Verbatim != "" && p.Value == "" {
 			value = p.Verbatim
+			tryUnmarshal = false
 		} else {
 			var v = &structpb.Value{}
 			if err := util.UnmarshalWithJSONPB(p.Value, v, false); err != nil {
@@ -212,6 +214,7 @@ func applyPatches(base *object.K8sObject, patches []*types.K8sObjectOverlayPatch
 				continue
 			}
 			value = v.AsInterface()
+			tryUnmarshal = true
 		}
 		if strings.TrimSpace(p.Path) == "" {
 			scope.V(2).Info("skipping empty path", "value", value)
@@ -223,7 +226,7 @@ func applyPatches(base *object.K8sObject, patches []*types.K8sObjectOverlayPatch
 			errs = util.AppendErr(errs, err)
 			continue
 		}
-		err = tpath.WritePathContext(inc, value, false)
+		err = tpath.WritePathContext(inc, value, false, tryUnmarshal)
 		if err != nil {
 			errs = util.AppendErr(errs, err)
 		}
