@@ -72,11 +72,11 @@ func GetPathContext(root any, path util.Path, createMissing bool) (*PathContext,
 }
 
 // WritePathContext writes the given value to the Node in the given PathContext.
-func WritePathContext(nc *PathContext, value any, merge bool) error {
+func WritePathContext(nc *PathContext, value any, merge bool, tryUnmarshal bool) error {
 	//scope.Debugf("WritePathContext PathContext=%s, value=%v", nc, value)
 
 	if !util.IsValueNil(value) {
-		return setPathContext(nc, value, merge)
+		return setPathContext(nc, value, merge, tryUnmarshal)
 	}
 
 	//scope.Debug("delete")
@@ -107,7 +107,7 @@ func WriteNode(root any, path util.Path, value any) error {
 	if err != nil {
 		return err
 	}
-	return WritePathContext(pc, value, false)
+	return WritePathContext(pc, value, false, true)
 }
 
 // MergeNode merges value to the tree in root at the given path, creating any required missing internal nodes in path.
@@ -116,7 +116,7 @@ func MergeNode(root any, path util.Path, value any) error {
 	if err != nil {
 		return err
 	}
-	return WritePathContext(pc, value, true)
+	return WritePathContext(pc, value, true, true)
 }
 
 // Find returns the value at path from the given tree, or false if the path does not exist.
@@ -137,7 +137,7 @@ func Delete(root map[string]any, path util.Path) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return true, WritePathContext(pc, nil, false)
+	return true, WritePathContext(pc, nil, false, true)
 }
 
 // getPathContext is the internal implementation of GetPathContext.
@@ -317,8 +317,8 @@ func getPathContext(nc *PathContext, fullPath, remainPath util.Path, createMissi
 
 // setPathContext writes the given value to the Node in the given PathContext,
 // enlarging all PathContext lists to ensure all indexes are valid.
-func setPathContext(nc *PathContext, value any, merge bool) error {
-	processParent, err := setValueContext(nc, value, merge)
+func setPathContext(nc *PathContext, value any, merge bool, tryUnmarshal bool) error {
+	processParent, err := setValueContext(nc, value, merge, tryUnmarshal)
 	if err != nil || !processParent {
 		return err
 	}
@@ -327,17 +327,20 @@ func setPathContext(nc *PathContext, value any, merge bool) error {
 	if nc.Parent.Parent == nil {
 		return nil
 	}
-	return setPathContext(nc.Parent, nc.Parent.Node, false) // note: tail recursive
+	return setPathContext(nc.Parent, nc.Parent.Node, false, tryUnmarshal) // note: tail recursive
 }
 
 // setValueContext writes the given value to the Node in the given PathContext.
 // If setting the value requires growing the final slice, grows it.
-func setValueContext(nc *PathContext, value any, merge bool) (bool, error) {
+func setValueContext(nc *PathContext, value any, merge bool, tryUnmarshal bool) (bool, error) {
 	if nc.Parent == nil {
 		return false, nil
 	}
 
-	vv, mapFromString := tryToUnmarshalStringToYAML(value)
+	vv, mapFromString := value, false
+	if tryUnmarshal {
+		vv, mapFromString = tryToUnmarshalStringToYAML(value)
+	}
 
 	switch parentNode := nc.Parent.Node.(type) {
 	case *any:
