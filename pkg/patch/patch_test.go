@@ -539,6 +539,10 @@ data:
 
       log_timezone = 'Etc/UTC' # comment
       more = false
+  - path: data.yaml_looking_file
+    verbatim: |
+     foo: true
+     bar: baz
 `
 	want := `
 apiVersion: v1
@@ -556,6 +560,9 @@ data:
   hba.conf: |-
     # PostgreSQL Client Authentication Configuration File
     local   all             all                                     scram-sha-256
+  yaml_looking_file: |
+   foo: true
+   bar: baz
 `
 	rc := &KubernetesResourcesSpec{}
 	if err := yaml.Unmarshal([]byte(overlays), rc); err != nil {
