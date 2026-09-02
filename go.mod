@@ -1,8 +1,6 @@
 module github.com/stackrox/k8s-overlay-patch
 
-go 1.21
-
-toolchain go1.22.4
+go 1.23
 
 require (
 	github.com/evanphx/json-patch/v5 v5.9.0
@@ -11,7 +9,7 @@ require (
 	github.com/kylelemons/godebug v1.1.0
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.9.0
-	google.golang.org/protobuf v1.33.0
+	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/apimachinery v0.29.3
 	sigs.k8s.io/yaml v1.4.0
@@ -83,7 +81,7 @@ require (
 	github.com/golangci/plugin-module-register v0.1.1 // indirect
 	github.com/golangci/revgrep v0.5.3 // indirect
 	github.com/golangci/unconvert v0.0.0-20240309020433-c5143eacb3ed // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/gordonklaus/ineffassign v0.1.0 // indirect
 	github.com/gostaticanalysis/analysisutil v0.7.1 // indirect
